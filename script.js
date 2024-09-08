@@ -1,4 +1,3 @@
-//your JS code here. If required.
 document.addEventListener('DOMContentLoaded', () => {
   const items = document.querySelectorAll('.item');
   const dropZones = document.querySelectorAll('.drop-zone');
@@ -15,7 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   function dragStart(e) {
-    e.dataTransfer.setData('text/plain', e.target.id);
+    if (e.dataTransfer) {
+      e.dataTransfer.setData('text/plain', e.target.id);
+    }
+    // For testing purposes, set a custom attribute
+    e.target.setAttribute('data-dragging', 'true');
   }
 
   function dragOver(e) {
@@ -24,12 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function drop(e) {
     e.preventDefault();
-    const id = e.dataTransfer.getData('text');
-    const draggableElement = document.getElementById(id);
+    let draggedElement;
+    if (e.dataTransfer) {
+      const id = e.dataTransfer.getData('text');
+      draggedElement = document.getElementById(id);
+    } else {
+      // For testing purposes, find the element with data-dragging attribute
+      draggedElement = document.querySelector('[data-dragging="true"]');
+    }
     const dropzone = e.target.closest('.drop-zone');
 
-    if (dropzone && dropzone !== draggableElement.parentNode) {
-      dropzone.appendChild(draggableElement);
+    if (dropzone && draggedElement && dropzone !== draggedElement.parentNode) {
+      dropzone.appendChild(draggedElement);
+    }
+
+    // Clean up the data-dragging attribute
+    if (draggedElement) {
+      draggedElement.removeAttribute('data-dragging');
     }
   }
 
